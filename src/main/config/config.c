@@ -143,7 +143,7 @@ static const uint8_t EEPROM_CONF_VERSION = 98;
 static void resetAccelerometerTrims(flightDynamicsTrims_t *accelerometerTrims)
 {
     accelerometerTrims->values.pitch = 0;
-    accelerometerTrims->values.roll = 0;
+    accelerometerTrims->values.roll = 256; // for RCExplorer to ensure accZ is +1 G before calibration
     accelerometerTrims->values.yaw = 0;
 }
 
@@ -151,15 +151,15 @@ static void resetPidProfile(pidProfile_t *pidProfile)
 {
     pidProfile->pidController = 0;
 
-    pidProfile->P8[ROLL] = 40;
-    pidProfile->I8[ROLL] = 30;
-    pidProfile->D8[ROLL] = 23;
-    pidProfile->P8[PITCH] = 40;
-    pidProfile->I8[PITCH] = 30;
-    pidProfile->D8[PITCH] = 23;
-    pidProfile->P8[YAW] = 85;
-    pidProfile->I8[YAW] = 45;
-    pidProfile->D8[YAW] = 0;
+    pidProfile->P8[ROLL] = 34;
+    pidProfile->I8[ROLL] = 35;
+    pidProfile->D8[ROLL] = 42;
+    pidProfile->P8[PITCH] = 34;
+    pidProfile->I8[PITCH] = 35;
+    pidProfile->D8[PITCH] = 42;
+    pidProfile->P8[YAW] = 53;
+    pidProfile->I8[YAW] = 15;
+    pidProfile->D8[YAW] = 10;
     pidProfile->P8[PIDALT] = 50;
     pidProfile->I8[PIDALT] = 0;
     pidProfile->D8[PIDALT] = 0;
@@ -172,8 +172,8 @@ static void resetPidProfile(pidProfile_t *pidProfile)
     pidProfile->P8[PIDNAVR] = 25; // NAV_P * 10;
     pidProfile->I8[PIDNAVR] = 33; // NAV_I * 100;
     pidProfile->D8[PIDNAVR] = 83; // NAV_D * 1000;
-    pidProfile->P8[PIDLEVEL] = 90;
-    pidProfile->I8[PIDLEVEL] = 10;
+    pidProfile->P8[PIDLEVEL] = 60;
+    pidProfile->I8[PIDLEVEL] = 6;
     pidProfile->D8[PIDLEVEL] = 100;
     pidProfile->P8[PIDMAG] = 40;
     pidProfile->P8[PIDVEL] = 120;
@@ -182,18 +182,18 @@ static void resetPidProfile(pidProfile_t *pidProfile)
 
     pidProfile->yaw_p_limit = 0;
 
-    pidProfile->P_f[ROLL] = 2.5f;     // new PID with preliminary defaults test carefully
-    pidProfile->I_f[ROLL] = 0.6f;
-    pidProfile->D_f[ROLL] = 0.06f;
-    pidProfile->P_f[PITCH] = 2.5f;
-    pidProfile->I_f[PITCH] = 0.6f;
-    pidProfile->D_f[PITCH] = 0.06f;
-    pidProfile->P_f[YAW] = 8.0f;
-    pidProfile->I_f[YAW] = 0.5f;
-    pidProfile->D_f[YAW] = 0.05f;
+    pidProfile->P_f[ROLL] = 1.9f;     // new PID with preliminary defaults test carefully
+    pidProfile->I_f[ROLL] = 0.3f;
+    pidProfile->D_f[ROLL] = 0.029f;
+    pidProfile->P_f[PITCH] = 1.9f;
+    pidProfile->I_f[PITCH] = 0.3f;
+    pidProfile->D_f[PITCH] = 0.029f;
+    pidProfile->P_f[YAW] = 2.9f;
+    pidProfile->I_f[YAW] = 0.8f;
+    pidProfile->D_f[YAW] = 0.03f;
     pidProfile->A_level = 5.0f;
-    pidProfile->H_level = 3.0f;
-    pidProfile->H_sensitivity = 75;
+    pidProfile->H_level = 4.0f;
+    pidProfile->H_sensitivity = 101;
 }
 
 #ifdef GPS
@@ -226,8 +226,8 @@ void resetSensorAlignment(sensorAlignmentConfig_t *sensorAlignmentConfig)
 
 void resetEscAndServoConfig(escAndServoConfig_t *escAndServoConfig)
 {
-    escAndServoConfig->minthrottle = 1150;
-    escAndServoConfig->maxthrottle = 1850;
+    escAndServoConfig->minthrottle = 1100;
+    escAndServoConfig->maxthrottle = 1900;
     escAndServoConfig->mincommand = 1000;
     escAndServoConfig->servoCenterPulse = 1500;
 }
@@ -296,23 +296,24 @@ void resetSerialConfig(serialConfig_t *serialConfig)
 }
 
 static void resetControlRateConfig(controlRateConfig_t *controlRateConfig) {
-    controlRateConfig->rcRate8 = 90;
-    controlRateConfig->rcExpo8 = 65;
+    controlRateConfig->rcRate8 = 100;
+    controlRateConfig->rcExpo8 = 70;
     controlRateConfig->thrMid8 = 50;
     controlRateConfig->thrExpo8 = 0;
-    controlRateConfig->dynThrPID = 0;
+    controlRateConfig->dynThrPID = 25;
     controlRateConfig->rcYawExpo8 = 0;
     controlRateConfig->tpa_breakpoint = 1500;
 
     for (uint8_t axis = 0; axis < FLIGHT_DYNAMICS_INDEX_COUNT; axis++) {
         controlRateConfig->rates[axis] = 0;
     }
+    controlRateConfig->rates[FD_YAW] = 10; // for RCExplorer
 
 }
 
 void resetRcControlsConfig(rcControlsConfig_t *rcControlsConfig) {
-    rcControlsConfig->deadband = 0;
-    rcControlsConfig->yaw_deadband = 0;
+    rcControlsConfig->deadband = 4;
+    rcControlsConfig->yaw_deadband = 5;
     rcControlsConfig->alt_hold_deadband = 40;
     rcControlsConfig->alt_hold_fast_change = 1;
 }
@@ -368,8 +369,9 @@ static void resetConf(void)
     setControlRateProfile(0);
 
     masterConfig.version = EEPROM_CONF_VERSION;
-    masterConfig.mixerMode = MIXER_QUADX;
+    masterConfig.mixerMode = MIXER_TRI;
     featureClearAll();
+    featureSet(FEATURE_MOTOR_STOP);
 #if defined(CJMCU) || defined(SPARKY)
     featureSet(FEATURE_RX_PPM);
 #endif
@@ -377,10 +379,10 @@ static void resetConf(void)
 #ifdef BOARD_HAS_VOLTAGE_DIVIDER
     // only enable the VBAT feature by default if the board has a voltage divider otherwise
     // the user may see incorrect readings and unexpected issues with pin mappings may occur.
-    featureSet(FEATURE_VBAT);
+//    featureSet(FEATURE_VBAT);
 #endif
 
-    featureSet(FEATURE_FAILSAFE);
+//    featureSet(FEATURE_FAILSAFE);
 
     // global settings
     masterConfig.current_profile_index = 0;     // default profile
@@ -438,7 +440,7 @@ static void resetConf(void)
 #else
     masterConfig.motor_pwm_rate = BRUSHLESS_MOTORS_PWM_RATE;
 #endif
-    masterConfig.servo_pwm_rate = 50;
+    masterConfig.servo_pwm_rate = 330;
 
 #ifdef GPS
     // gps/nav stuff
@@ -450,7 +452,7 @@ static void resetConf(void)
 
     resetSerialConfig(&masterConfig.serialConfig);
 
-    masterConfig.looptime = 3500;
+    masterConfig.looptime = 2500;
     masterConfig.emf_avoidance = 0;
 
     resetPidProfile(&currentProfile->pidProfile);
@@ -483,7 +485,7 @@ static void resetConf(void)
     // Failsafe Variables
     masterConfig.failsafeConfig.failsafe_delay = 10;              // 1sec
     masterConfig.failsafeConfig.failsafe_off_delay = 200;         // 20sec
-    masterConfig.failsafeConfig.failsafe_throttle = 1000;         // default throttle off.
+    masterConfig.failsafeConfig.failsafe_throttle = 1200;         // default throttle off.
 
 #ifdef USE_SERVOS
     // servos
