@@ -143,7 +143,7 @@ static const uint8_t EEPROM_CONF_VERSION = 98;
 static void resetAccelerometerTrims(flightDynamicsTrims_t *accelerometerTrims)
 {
     accelerometerTrims->values.pitch = 0;
-    accelerometerTrims->values.roll = 256; // for RCExplorer to ensure accZ is +1 G before calibration
+    accelerometerTrims->values.roll = 0;
     accelerometerTrims->values.yaw = 0;
 }
 
