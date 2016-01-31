@@ -33,9 +33,9 @@ auxillary receiver channels and other events such as failsafe detection.
 
 ### Headfree
 
-In this mode, the "head" of the multicopter is always pointing to the same direction as when the feature was activated. This means that when the multicopter rotates around the Z axis (yaw), the controls will always respond according the same "head" direction.
+In this mode, the "head" of the multicopter is always pointing in the same direction when the feature was activated. This means that when the multicopter rotates around the Z axis (yaw), the controls will always respond according the same "head" direction.
 
-With this mode it is easier to control the multicopter, even fly it with the physical head towards you since the controls always respond the same. This is a friendly mode to new users of multicopters and can prevent losing the control when you don't know the head direction. 
+With this mode it is easier to control the multicopter, even fly it with the physical head towards you since the controls always respond the same. This is a friendly mode to new users of multicopters and can prevent losing the control when you don't know the physical head direction. 
 
 ### GPS Return To Home
 
@@ -77,7 +77,7 @@ Use the GUI configuration tool to allow easy configuration when channel.
 
 There is a CLI command, `aux` that allows auxillary configuration.  It takes 5 arguments as follows:
 
-* AUD range slot number (0 - 39)
+* AUX range slot number (0 - 39)
 * mode id (see mode list above)
 * AUX channel index (AUX1 = 0, AUX2 = 1,... etc)
 * low position, from 900 to 2100. Should be a multiple of 25.
@@ -87,7 +87,7 @@ If the low and high position are the same then the values are ignored.
 
 e.g.
 
-Configure AUX range slot 0 to enable ARM when AUX1 is withing 1700 and 2100.
+Configure AUX range slot 0 to enable ARM when AUX1 is within 1700 and 2100.
  
 ```
 aux 0 0 0 1700 2100
